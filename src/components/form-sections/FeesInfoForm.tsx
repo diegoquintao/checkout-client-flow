@@ -25,13 +25,12 @@ import {
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  feeStructure: z.string().min(1, { message: "Fee structure is required" }),
-  additionalFeeInfo: z.string().optional(),
   anticipationType: z.enum(["none", "occasional", "mandatory"], {
     required_error: "Anticipation type is required",
   }),
   anticipationPeriodicity: z.enum(["daily", "weekly", "biweekly"]).optional(),
   anticipationAmount: z.string().optional(),
+  additionalFeeInfo: z.string().optional(),
 });
 
 interface FeesInfoFormProps {
@@ -43,11 +42,10 @@ const FeesInfoForm = ({ initialData = {}, onSubmit }: FeesInfoFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      feeStructure: initialData.feeStructure || "",
-      additionalFeeInfo: initialData.additionalFeeInfo || "",
       anticipationType: initialData.anticipationType || "none",
       anticipationPeriodicity: initialData.anticipationPeriodicity || undefined,
       anticipationAmount: initialData.anticipationAmount || "",
+      additionalFeeInfo: initialData.additionalFeeInfo || "",
     },
   });
   
@@ -62,31 +60,6 @@ const FeesInfoForm = ({ initialData = {}, onSubmit }: FeesInfoFormProps) => {
         className="space-y-6"
       >
         <div className="grid grid-cols-1 gap-6">
-          <div className="p-4 bg-yellow-50 rounded-md">
-            <h3 className="text-xl font-medium mb-2">Taxas</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Provide information about your fee structure and rates for payment processing.
-            </p>
-          </div>
-
-          <FormField
-            control={form.control}
-            name="feeStructure"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tabela de taxas *</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Enter your fee structure information here..."
-                    className="min-h-[150px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className="p-4 bg-blue-50 rounded-md">
             <h3 className="text-xl font-medium mb-2">Anticipation Options</h3>
             <p className="text-sm text-gray-600 mb-4">
