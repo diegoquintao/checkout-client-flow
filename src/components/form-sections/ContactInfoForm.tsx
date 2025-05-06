@@ -3,7 +3,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { mail, phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -62,7 +62,7 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
                 <FormControl>
                   <div className="flex">
                     <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <mail className="h-4 w-4 text-gray-500" />
+                      <Mail className="h-4 w-4 text-gray-500" />
                     </div>
                     <Input
                       placeholder="your@email.com"
@@ -126,7 +126,7 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
                 <FormControl>
                   <div className="flex">
                     <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <phone className="h-4 w-4 text-gray-500" />
+                      <Phone className="h-4 w-4 text-gray-500" />
                     </div>
                     <Input
                       placeholder="98765-4321"

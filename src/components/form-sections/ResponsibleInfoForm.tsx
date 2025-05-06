@@ -3,7 +3,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { CalendarIcon, user } from "lucide-react";
+import { CalendarIcon, User } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
@@ -71,7 +71,7 @@ const ResponsibleInfoForm = ({ initialData = {}, onSubmit }: ResponsibleInfoForm
                 <FormControl>
                   <div className="flex">
                     <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <user className="h-4 w-4 text-gray-500" />
+                      <User className="h-4 w-4 text-gray-500" />
                     </div>
                     <Input
                       placeholder="Full name"

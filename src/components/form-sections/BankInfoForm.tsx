@@ -3,7 +3,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { banknote } from "lucide-react";
+import { Banknote } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -125,7 +125,7 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
                 <FormControl>
                   <div className="flex">
                     <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <banknote className="h-4 w-4 text-gray-500" />
+                      <Banknote className="h-4 w-4 text-gray-500" />
                     </div>
                     <Input
                       placeholder="Bank name"
