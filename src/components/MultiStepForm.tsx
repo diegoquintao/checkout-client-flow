@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -70,6 +69,13 @@ const MultiStepForm = () => {
     });
   };
 
+  const goToStep = (stepIndex: number) => {
+    if (stepIndex >= 0 && stepIndex < steps.length) {
+      setCurrentStep(stepIndex);
+      window.scrollTo(0, 0);
+    }
+  };
+
   const renderFormSection = () => {
     switch (currentStep) {
       case 0:
@@ -128,7 +134,11 @@ const MultiStepForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <FormStepper steps={steps} currentStep={currentStep} />
+      <FormStepper 
+        steps={steps} 
+        currentStep={currentStep} 
+        onStepClick={goToStep}
+      />
       
       <Card className="p-6 shadow-md mt-8">
         <div className="mb-6">
@@ -151,8 +161,8 @@ const MultiStepForm = () => {
           </Button>
 
           {currentStep !== steps.length - 1 && (
-            <Button type="button" form={`form-step-${currentStep}`}>
-              Continue
+            <Button type="button" onClick={handleNext}>
+              Skip & Continue
             </Button>
           )}
 
