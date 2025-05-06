@@ -15,24 +15,24 @@ import FormStepper from "./FormStepper";
 
 const steps = [
   { id: 0, title: "Company", description: "Company Information" },
-  { id: 1, title: "Contact", description: "Contact Details" },
-  { id: 2, title: "Fees", description: "Fee Structure" },
-  { id: 3, title: "Operation", description: "Operation Details" },
-  { id: 4, title: "Responsible Person", description: "Responsible Individual" },
-  { id: 5, title: "Address", description: "Address Information" },
-  { id: 6, title: "Banking", description: "Banking Details" },
+  { id: 1, title: "Responsible Person", description: "Responsible Individual" },
+  { id: 2, title: "Contact", description: "Contact Details" },
+  { id: 3, title: "Address", description: "Address Information" },
+  { id: 4, title: "Banking", description: "Banking Details" },
+  { id: 5, title: "Fees", description: "Fee Structure" },
+  { id: 6, title: "Operation", description: "Operation Details" },
 ];
 
 const MultiStepForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     company: {},
-    contact: {},
-    fees: {},
-    operation: {},
     responsible: {},
+    contact: {},
     address: {},
     banking: {},
+    fees: {},
+    operation: {},
   });
 
   const handleNext = () => {
@@ -81,44 +81,44 @@ const MultiStepForm = () => {
         );
       case 1:
         return (
-          <ContactInfoForm
-            initialData={formData.contact}
-            onSubmit={(data) => handleSubmitSection(data, 'contact')}
-          />
-        );
-      case 2:
-        return (
-          <FeesInfoForm
-            initialData={formData.fees}
-            onSubmit={(data) => handleSubmitSection(data, 'fees')}
-          />
-        );
-      case 3:
-        return (
-          <OperationInfoForm
-            initialData={formData.operation}
-            onSubmit={(data) => handleSubmitSection(data, 'operation')}
-          />
-        );
-      case 4:
-        return (
           <ResponsibleInfoForm
             initialData={formData.responsible}
             onSubmit={(data) => handleSubmitSection(data, 'responsible')}
           />
         );
-      case 5:
+      case 2:
+        return (
+          <ContactInfoForm
+            initialData={formData.contact}
+            onSubmit={(data) => handleSubmitSection(data, 'contact')}
+          />
+        );
+      case 3:
         return (
           <AddressInfoForm
             initialData={formData.address}
             onSubmit={(data) => handleSubmitSection(data, 'address')}
           />
         );
-      case 6:
+      case 4:
         return (
           <BankInfoForm
             initialData={formData.banking}
             onSubmit={(data) => handleSubmitSection(data, 'banking')}
+          />
+        );
+      case 5:
+        return (
+          <FeesInfoForm
+            initialData={formData.fees}
+            onSubmit={(data) => handleSubmitSection(data, 'fees')}
+          />
+        );
+      case 6:
+        return (
+          <OperationInfoForm
+            initialData={formData.operation}
+            onSubmit={(data) => handleSubmitSection(data, 'operation')}
           />
         );
       default:
