@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Banknote } from "lucide-react";
+import { useState, useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -19,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { brazilianBanks } from "@/utils/bankData";
 
 const formSchema = z.object({
   legalName: z.string().min(1, { message: "Legal name is required" }),
@@ -39,6 +41,9 @@ interface BankInfoFormProps {
 }
 
 const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
+  const [selectedBank, setSelectedBank] = useState(initialData.bank || "");
+  const [selectedBankCode, setSelectedBankCode] = useState(initialData.bankCode || "");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,6 +59,17 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
       accountType2: initialData.accountType2 || "",
     },
   });
+
+  // Update bank code when bank selection changes
+  const handleBankChange = (bankName: string) => {
+    const selectedBank = brazilianBanks.find(bank => bank.name === bankName);
+    if (selectedBank) {
+      setSelectedBank(bankName);
+      setSelectedBankCode(selectedBank.code);
+      form.setValue("bank", bankName);
+      form.setValue("bankCode", selectedBank.code);
+    }
+  };
 
   return (
     <Form {...form}>
@@ -122,18 +138,23 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Banco *</FormLabel>
-                <FormControl>
-                  <div className="flex">
-                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <Banknote className="h-4 w-4 text-gray-500" />
-                    </div>
-                    <Input
-                      placeholder="Bank name"
-                      {...field}
-                      className="rounded-l-none"
-                    />
-                  </div>
-                </FormControl>
+                <Select
+                  onValueChange={handleBankChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a bank" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {brazilianBanks.map((bank) => (
+                      <SelectItem key={bank.code} value={bank.name}>
+                        {bank.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -146,7 +167,12 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
               <FormItem>
                 <FormLabel>Código *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Bank code" {...field} />
+                  <Input 
+                    placeholder="Bank code" 
+                    {...field} 
+                    value={selectedBankCode || field.value}
+                    readOnly
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -186,7 +212,7 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
             name="accountNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Dígito da Conta *</FormLabel>
+                <FormLabel>Conta *</FormLabel>
                 <FormControl>
                   <Input placeholder="Account number" {...field} />
                 </FormControl>
@@ -225,10 +251,10 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="checking">Checking Account</SelectItem>
-                    <SelectItem value="savings">Savings Account</SelectItem>
-                    <SelectItem value="salary">Salary Account</SelectItem>
-                    <SelectItem value="investment">Investment Account</SelectItem>
+                    <SelectItem value="checking">Conta Corrente</SelectItem>
+                    <SelectItem value="savings">Conta Poupança</SelectItem>
+                    <SelectItem value="salary">Conta Salário</SelectItem>
+                    <SelectItem value="investment">Conta Investimento</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
