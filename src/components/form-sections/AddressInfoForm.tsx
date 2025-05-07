@@ -3,7 +3,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { MapPin } from "lucide-react";
+import { MapPin, Search } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -19,16 +19,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  street: z.string().min(1, { message: "Street is required" }),
-  number: z.string().min(1, { message: "Number is required" }),
+  zipCode: z.string().min(1, { message: "CEP é obrigatório" }),
+  street: z.string().min(1, { message: "Rua é obrigatória" }),
+  number: z.string().min(1, { message: "Número é obrigatório" }),
   complement: z.string().optional(),
-  neighborhood: z.string().min(1, { message: "Neighborhood is required" }),
-  zipCode: z.string().min(1, { message: "ZIP code is required" }),
-  city: z.string().min(1, { message: "City is required" }),
-  state: z.string().min(1, { message: "State is required" }),
-  country: z.string().min(1, { message: "Country is required" }),
+  neighborhood: z.string().min(1, { message: "Bairro é obrigatório" }),
+  city: z.string().min(1, { message: "Cidade é obrigatória" }),
+  state: z.string().min(1, { message: "Estado é obrigatório" }),
+  country: z.string().min(1, { message: "País é obrigatório" }),
 });
 
 interface AddressInfoFormProps {
@@ -37,43 +39,140 @@ interface AddressInfoFormProps {
 }
 
 const AddressInfoForm = ({ initialData = {}, onSubmit }: AddressInfoFormProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      zipCode: initialData.zipCode || "",
       street: initialData.street || "",
       number: initialData.number || "",
       complement: initialData.complement || "",
       neighborhood: initialData.neighborhood || "",
-      zipCode: initialData.zipCode || "",
       city: initialData.city || "",
       state: initialData.state || "",
-      country: initialData.country || "",
+      country: initialData.country || "BR", // Default to Brazil
     },
   });
+
+  const fetchAddressData = async (cep: string) => {
+    if (!cep || cep.length < 8) return;
+    
+    const cepClean = cep.replace(/\D/g, '');
+    
+    if (cepClean.length !== 8) {
+      toast.error("CEP inválido", {
+        description: "O CEP deve conter 8 dígitos",
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`https://viacep.com.br/ws/${cepClean}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        toast.error("CEP não encontrado", {
+          description: "Verifique o CEP e tente novamente",
+        });
+        return;
+      }
+      
+      // Update form fields with received data
+      form.setValue("street", data.logradouro || "");
+      form.setValue("neighborhood", data.bairro || "");
+      form.setValue("city", data.localidade || "");
+      form.setValue("state", data.uf || "");
+      form.setValue("country", "BR"); // Brazil by default for BR CEP
+
+      toast.success("Endereço encontrado!", {
+        description: "Os campos foram preenchidos automaticamente",
+      });
+    } catch (error) {
+      console.error("Error fetching CEP data:", error);
+      toast.error("Erro ao buscar o endereço", {
+        description: "Tente novamente ou preencha manualmente",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle CEP search when the user finishes typing
+  const handleCepChange = (value: string) => {
+    if (value.length >= 8) {
+      fetchAddressData(value);
+    }
+  };
+
+  // Handle CEP search button click
+  const handleSearchClick = () => {
+    const cep = form.getValues("zipCode");
+    fetchAddressData(cep);
+  };
 
   return (
     <Form {...form}>
       <form
-        id="form-step-5"
+        id="form-step-3"
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-6"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* CEP/ZIP Code field - now first */}
+          <FormField
+            control={form.control}
+            name="zipCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium text-blip-text-gray">CEP *</FormLabel>
+                <FormControl>
+                  <div className="flex">
+                    <Input
+                      placeholder="00000-000"
+                      {...field}
+                      className="rounded-r-none border-r-0 transition-all focus-visible:ring-blip-primary"
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleCepChange(e.target.value);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSearchClick}
+                      className="flex items-center px-3 bg-blip-primary hover:bg-blip-primary-hover text-white rounded-r-md border border-blip-primary transition-colors"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      ) : (
+                        <Search className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Street field */}
           <FormField
             control={form.control}
             name="street"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Rua/Av. *</FormLabel>
+                <FormLabel className="font-medium text-blip-text-gray">Rua/Av. *</FormLabel>
                 <FormControl>
                   <div className="flex">
-                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <MapPin className="h-4 w-4 text-gray-500" />
+                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-blip-light-cyan">
+                      <MapPin className="h-4 w-4 text-blip-primary" />
                     </div>
                     <Input
-                      placeholder="Street name"
+                      placeholder="Nome da rua"
                       {...field}
-                      className="rounded-l-none"
+                      className="rounded-l-none transition-all focus-visible:ring-blip-primary"
                     />
                   </div>
                 </FormControl>
@@ -87,9 +186,13 @@ const AddressInfoForm = ({ initialData = {}, onSubmit }: AddressInfoFormProps) =
             name="number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Número *</FormLabel>
+                <FormLabel className="font-medium text-blip-text-gray">Número *</FormLabel>
                 <FormControl>
-                  <Input placeholder="123" {...field} />
+                  <Input 
+                    placeholder="123" 
+                    {...field} 
+                    className="transition-all focus-visible:ring-blip-primary"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -101,9 +204,13 @@ const AddressInfoForm = ({ initialData = {}, onSubmit }: AddressInfoFormProps) =
             name="complement"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Complemento</FormLabel>
+                <FormLabel className="font-medium text-blip-text-gray">Complemento</FormLabel>
                 <FormControl>
-                  <Input placeholder="Apartment, suite, etc." {...field} />
+                  <Input 
+                    placeholder="Apartamento, sala, etc." 
+                    {...field} 
+                    className="transition-all focus-visible:ring-blip-primary"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -115,23 +222,13 @@ const AddressInfoForm = ({ initialData = {}, onSubmit }: AddressInfoFormProps) =
             name="neighborhood"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bairro *</FormLabel>
+                <FormLabel className="font-medium text-blip-text-gray">Bairro *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Neighborhood" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="zipCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>CEP *</FormLabel>
-                <FormControl>
-                  <Input placeholder="00000-000" {...field} />
+                  <Input 
+                    placeholder="Bairro" 
+                    {...field} 
+                    className="transition-all focus-visible:ring-blip-primary"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -143,9 +240,13 @@ const AddressInfoForm = ({ initialData = {}, onSubmit }: AddressInfoFormProps) =
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cidade *</FormLabel>
+                <FormLabel className="font-medium text-blip-text-gray">Cidade *</FormLabel>
                 <FormControl>
-                  <Input placeholder="City" {...field} />
+                  <Input 
+                    placeholder="Cidade" 
+                    {...field} 
+                    className="transition-all focus-visible:ring-blip-primary"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -157,17 +258,18 @@ const AddressInfoForm = ({ initialData = {}, onSubmit }: AddressInfoFormProps) =
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Estado *</FormLabel>
+                <FormLabel className="font-medium text-blip-text-gray">Estado *</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  value={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select state" />
+                    <SelectTrigger className="border-blip-light-cyan focus:ring-blip-primary">
+                      <SelectValue placeholder="Selecione o estado" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="bg-white border-blip-light-cyan">
                     <SelectItem value="AC">Acre</SelectItem>
                     <SelectItem value="AL">Alagoas</SelectItem>
                     <SelectItem value="AP">Amapá</SelectItem>
@@ -207,19 +309,20 @@ const AddressInfoForm = ({ initialData = {}, onSubmit }: AddressInfoFormProps) =
             name="country"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>País *</FormLabel>
+                <FormLabel className="font-medium text-blip-text-gray">País *</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  value={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
+                    <SelectTrigger className="border-blip-light-cyan focus:ring-blip-primary">
+                      <SelectValue placeholder="Selecione o país" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="BR">Brazil</SelectItem>
-                    <SelectItem value="US">United States</SelectItem>
+                  <SelectContent className="bg-white border-blip-light-cyan">
+                    <SelectItem value="BR">Brasil</SelectItem>
+                    <SelectItem value="US">Estados Unidos</SelectItem>
                     <SelectItem value="PT">Portugal</SelectItem>
                     <SelectItem value="AR">Argentina</SelectItem>
                     <SelectItem value="CL">Chile</SelectItem>
