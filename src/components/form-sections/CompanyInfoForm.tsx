@@ -66,20 +66,20 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             name="fantasyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome Fantasia *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Nome Fantasia *</FormLabel>
                 <FormControl>
                   <div className="flex">
-                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <Building className="h-4 w-4 text-gray-500" />
+                    <div className="flex items-center px-3 bg-blip-secondary-light border border-r-0 rounded-l-md border-blip-light-cyan">
+                      <Building className="h-4 w-4 text-blip-gray" />
                     </div>
                     <Input
                       placeholder="Your business name"
                       {...field}
-                      className="rounded-l-none"
+                      className="rounded-l-none border-blip-light-cyan focus:border-primary focus:ring-primary"
                     />
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -89,11 +89,15 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             name="legalName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cliente/Razão Social *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Cliente/Razão Social *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Legal name of company" {...field} />
+                  <Input 
+                    placeholder="Legal name of company" 
+                    {...field} 
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -103,11 +107,15 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             name="documentNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>CNPJ/CPF *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">CNPJ/CPF *</FormLabel>
                 <FormControl>
-                  <Input placeholder="00.000.000/0001-00" {...field} />
+                  <Input 
+                    placeholder="00.000.000/0001-00" 
+                    {...field} 
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -117,11 +125,15 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             name="establishmentType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tipo de Estabelecimento *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Tipo de Estabelecimento *</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. Retail, Service" {...field} />
+                  <Input 
+                    placeholder="e.g. Retail, Service" 
+                    {...field} 
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -131,20 +143,20 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             name="cnae"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>CNAE / MCC *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">CNAE / MCC *</FormLabel>
                 <FormControl>
                   <div className="flex">
-                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <FileText className="h-4 w-4 text-gray-500" />
+                    <div className="flex items-center px-3 bg-blip-secondary-light border border-r-0 rounded-l-md border-blip-light-cyan">
+                      <FileText className="h-4 w-4 text-blip-gray" />
                     </div>
                     <Input
                       placeholder="Activity code"
                       {...field}
-                      className="rounded-l-none"
+                      className="rounded-l-none border-blip-light-cyan focus:border-primary focus:ring-primary"
                     />
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -154,14 +166,14 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             name="openingDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Data de Abertura</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Data de Abertura</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "pl-3 text-left font-normal",
+                          "pl-3 text-left font-normal border-blip-light-cyan",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -183,10 +195,11 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                         date > new Date() || date < new Date("1900-01-01")
                       }
                       initialFocus
+                      className="border-blip-light-cyan"
                     />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />

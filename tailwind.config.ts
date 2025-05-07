@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,16 +26,34 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#2CC3D5', // Blip primary cyan
+					foreground: '#FFFFFF',
+					hover: '#00A7BC', // Darker cyan for hover
+					focus: '#00A7BC',
+					light: '#C9DFE4', // Light cyan for subtle elements
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#8E9196', // Blip neutral gray
+					foreground: '#FFFFFF',
+					hover: '#52636C', // Darker gray for hover
+					light: '#F8F9FA', // Light gray for backgrounds
+				},
+				blip: {
+					cyan: '#2CC3D5',
+					'dark-cyan': '#00A7BC',
+					'light-cyan': '#C9DFE4',
+					gray: '#8E9196',
+					'dark-gray': '#52636C',
+					'light-gray': '#F8F9FA',
+					'soft-gray': '#E8EBEE',
+					'text-gray': '#52636C',
+					'error': '#FF4A1E',
+					'success': '#4DCB7B',
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					DEFAULT: '#FF4A1E', // Blip error color
+					foreground: '#FFFFFF',
+					hover: '#E74A1E',
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
@@ -84,11 +103,21 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(5px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'scale-in': {
+					'0%': { transform: 'scale(0.95)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'scale-in': 'scale-in 0.2s ease-out'
 			}
 		}
 	},

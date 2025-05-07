@@ -2,7 +2,6 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -18,7 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
   paymentMethod: z.string().min(1, { message: "Payment method is required" }),
@@ -54,25 +52,25 @@ const OperationInfoForm = ({ initialData = {}, onSubmit }: OperationInfoFormProp
             name="paymentMethod"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Método de Processamento *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Método de Processamento *</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-blip-light-cyan focus:ring-primary">
                       <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="credit">Credit Card</SelectItem>
-                    <SelectItem value="debit">Debit Card</SelectItem>
-                    <SelectItem value="pix">PIX</SelectItem>
-                    <SelectItem value="boleto">Boleto</SelectItem>
-                    <SelectItem value="transfer">Bank Transfer</SelectItem>
+                  <SelectContent className="bg-white border-blip-light-cyan">
+                    <SelectItem value="credit" className="text-blip-text-gray hover:bg-blip-secondary-light">Credit Card</SelectItem>
+                    <SelectItem value="debit" className="text-blip-text-gray hover:bg-blip-secondary-light">Debit Card</SelectItem>
+                    <SelectItem value="pix" className="text-blip-text-gray hover:bg-blip-secondary-light">PIX</SelectItem>
+                    <SelectItem value="boleto" className="text-blip-text-gray hover:bg-blip-secondary-light">Boleto</SelectItem>
+                    <SelectItem value="transfer" className="text-blip-text-gray hover:bg-blip-secondary-light">Bank Transfer</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -82,24 +80,24 @@ const OperationInfoForm = ({ initialData = {}, onSubmit }: OperationInfoFormProp
             name="cardProcessingMethod"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Processamento do Cartão *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Processamento do Cartão *</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-blip-light-cyan focus:ring-primary">
                       <SelectValue placeholder="Select card processing method" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="pos">POS Terminal</SelectItem>
-                    <SelectItem value="online">Online Gateway</SelectItem>
-                    <SelectItem value="mobile">Mobile Payment</SelectItem>
-                    <SelectItem value="moto">MOTO (Mail Order/Telephone Order)</SelectItem>
+                  <SelectContent className="bg-white border-blip-light-cyan">
+                    <SelectItem value="pos" className="text-blip-text-gray hover:bg-blip-secondary-light">POS Terminal</SelectItem>
+                    <SelectItem value="online" className="text-blip-text-gray hover:bg-blip-secondary-light">Online Gateway</SelectItem>
+                    <SelectItem value="mobile" className="text-blip-text-gray hover:bg-blip-secondary-light">Mobile Payment</SelectItem>
+                    <SelectItem value="moto" className="text-blip-text-gray hover:bg-blip-secondary-light">MOTO (Mail Order/Telephone Order)</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -109,25 +107,25 @@ const OperationInfoForm = ({ initialData = {}, onSubmit }: OperationInfoFormProp
             name="terminalTimeZone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fuso horário do terminal</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Fuso horário do terminal</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-blip-light-cyan focus:ring-primary">
                       <SelectValue placeholder="Select terminal time zone" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="america_sao_paulo">America/Sao_Paulo</SelectItem>
-                    <SelectItem value="america_manaus">America/Manaus</SelectItem>
-                    <SelectItem value="america_rio_branco">America/Rio_Branco</SelectItem>
-                    <SelectItem value="america_belem">America/Belem</SelectItem>
-                    <SelectItem value="america_fortaleza">America/Fortaleza</SelectItem>
+                  <SelectContent className="bg-white border-blip-light-cyan">
+                    <SelectItem value="america_sao_paulo" className="text-blip-text-gray hover:bg-blip-secondary-light">America/Sao_Paulo</SelectItem>
+                    <SelectItem value="america_manaus" className="text-blip-text-gray hover:bg-blip-secondary-light">America/Manaus</SelectItem>
+                    <SelectItem value="america_rio_branco" className="text-blip-text-gray hover:bg-blip-secondary-light">America/Rio_Branco</SelectItem>
+                    <SelectItem value="america_belem" className="text-blip-text-gray hover:bg-blip-secondary-light">America/Belem</SelectItem>
+                    <SelectItem value="america_fortaleza" className="text-blip-text-gray hover:bg-blip-secondary-light">America/Fortaleza</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -140,13 +141,13 @@ const MultiStepForm = () => {
         onStepClick={goToStep}
       />
       
-      <Card className="p-6 shadow-md mt-8">
+      <Card className="p-6 shadow-md mt-8 border-blip-soft-gray bg-white transition-all duration-200 hover:shadow-lg">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
+          <h2 className="text-2xl font-semibold text-blip-dark-gray">
             {steps[currentStep].title}
           </h2>
-          <p className="text-gray-600">{steps[currentStep].description}</p>
-          <Separator className="mt-4" />
+          <p className="text-blip-text-gray">{steps[currentStep].description}</p>
+          <Separator className="mt-4 bg-blip-soft-gray" />
         </div>
 
         {renderFormSection()}
@@ -156,18 +157,27 @@ const MultiStepForm = () => {
             variant="outline"
             onClick={handlePrevious}
             disabled={currentStep === 0}
+            className="border-blip-light-cyan text-blip-dark-gray hover:bg-blip-light-gray hover:text-blip-dark-gray"
           >
             Previous
           </Button>
 
           {currentStep !== steps.length - 1 && (
-            <Button type="button" onClick={handleNext}>
+            <Button 
+              type="button" 
+              onClick={handleNext}
+              className="bg-primary hover:bg-primary-hover text-white"
+            >
               Skip & Continue
             </Button>
           )}
 
           {currentStep === steps.length - 1 && (
-            <Button type="submit" form={`form-step-${currentStep}`}>
+            <Button 
+              type="submit" 
+              form={`form-step-${currentStep}`}
+              className="bg-primary hover:bg-primary-hover text-white"
+            >
               Submit Registration
             </Button>
           )}

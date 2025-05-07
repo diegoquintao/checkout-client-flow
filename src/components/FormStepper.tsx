@@ -23,19 +23,19 @@ const FormStepper = ({ steps, currentStep, onStepClick }: FormStepperProps) => {
           className={cn(
             "flex flex-col items-center relative cursor-pointer",
             index !== steps.length - 1 &&
-              "after:content-[''] after:absolute after:w-full after:h-[2px] after:bg-gray-200 after:top-5 after:left-1/2 after:translate-y-0"
+              "after:content-[''] after:absolute after:w-full after:h-[2px] after:bg-blip-light-cyan after:top-5 after:left-1/2 after:translate-y-0"
           )}
           onClick={() => onStepClick?.(index)}
         >
           <div
             className={cn(
-              "w-10 h-10 flex items-center justify-center rounded-full border-2 relative z-10",
+              "w-10 h-10 flex items-center justify-center rounded-full border-2 relative z-10 transition-all duration-200",
               currentStep === index
-                ? "bg-blue-600 border-blue-600 text-white"
+                ? "bg-primary border-primary text-white"
                 : index < currentStep
-                ? "bg-green-600 border-green-600 text-white"
-                : "bg-white border-gray-300 text-gray-400",
-              "hover:border-blue-400 transition-colors"
+                ? "bg-blip-success border-blip-success text-white"
+                : "bg-white border-blip-light-cyan text-blip-gray",
+              "hover:border-primary hover:shadow-sm"
             )}
           >
             {index < currentStep ? (
@@ -44,7 +44,10 @@ const FormStepper = ({ steps, currentStep, onStepClick }: FormStepperProps) => {
               <span>{index + 1}</span>
             )}
           </div>
-          <div className="text-xs mt-2 font-medium text-center">
+          <div className={cn(
+            "text-xs mt-2 font-medium text-center",
+            currentStep === index ? "text-blip-dark-gray" : "text-blip-gray"
+          )}>
             {step.title}
           </div>
         </div>

@@ -58,20 +58,20 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Email *</FormLabel>
                 <FormControl>
                   <div className="flex">
-                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <Mail className="h-4 w-4 text-gray-500" />
+                    <div className="flex items-center px-3 bg-blip-secondary-light border border-r-0 rounded-l-md border-blip-light-cyan">
+                      <Mail className="h-4 w-4 text-blip-gray" />
                     </div>
                     <Input
                       placeholder="your@email.com"
                       {...field}
-                      className="rounded-l-none"
+                      className="rounded-l-none border-blip-light-cyan focus:border-primary focus:ring-primary"
                     />
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -81,24 +81,24 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
             name="countryCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Código do País *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Código do País *</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-blip-light-cyan focus:ring-primary">
                       <SelectValue placeholder="Select country code" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="55">Brazil (+55)</SelectItem>
-                    <SelectItem value="1">USA/Canada (+1)</SelectItem>
-                    <SelectItem value="44">UK (+44)</SelectItem>
-                    <SelectItem value="351">Portugal (+351)</SelectItem>
+                  <SelectContent className="bg-white border-blip-light-cyan">
+                    <SelectItem value="55" className="text-blip-text-gray hover:bg-blip-secondary-light">Brazil (+55)</SelectItem>
+                    <SelectItem value="1" className="text-blip-text-gray hover:bg-blip-secondary-light">USA/Canada (+1)</SelectItem>
+                    <SelectItem value="44" className="text-blip-text-gray hover:bg-blip-secondary-light">UK (+44)</SelectItem>
+                    <SelectItem value="351" className="text-blip-text-gray hover:bg-blip-secondary-light">Portugal (+351)</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -108,11 +108,15 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
             name="areaCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Código de área *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Código de área *</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. 11" {...field} />
+                  <Input 
+                    placeholder="e.g. 11" 
+                    {...field} 
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary"
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -122,20 +126,20 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
             name="phoneNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Número do Telefone *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Número do Telefone *</FormLabel>
                 <FormControl>
                   <div className="flex">
-                    <div className="flex items-center px-3 bg-gray-50 border border-r-0 rounded-l-md border-input">
-                      <Phone className="h-4 w-4 text-gray-500" />
+                    <div className="flex items-center px-3 bg-blip-secondary-light border border-r-0 rounded-l-md border-blip-light-cyan">
+                      <Phone className="h-4 w-4 text-blip-gray" />
                     </div>
                     <Input
                       placeholder="98765-4321"
                       {...field}
-                      className="rounded-l-none"
+                      className="rounded-l-none border-blip-light-cyan focus:border-primary focus:ring-primary"
                     />
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
@@ -145,23 +149,23 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
             name="phoneType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tipo de telefone *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">Tipo de telefone *</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-blip-light-cyan focus:ring-primary">
                       <SelectValue placeholder="Select phone type" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="mobile">Mobile</SelectItem>
-                    <SelectItem value="landline">Landline</SelectItem>
-                    <SelectItem value="business">Business</SelectItem>
+                  <SelectContent className="bg-white border-blip-light-cyan">
+                    <SelectItem value="mobile" className="text-blip-text-gray hover:bg-blip-secondary-light">Mobile</SelectItem>
+                    <SelectItem value="landline" className="text-blip-text-gray hover:bg-blip-secondary-light">Landline</SelectItem>
+                    <SelectItem value="business" className="text-blip-text-gray hover:bg-blip-secondary-light">Business</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage className="text-blip-error" />
               </FormItem>
             )}
           />
