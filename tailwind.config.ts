@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,39 +18,44 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'carbona': ['Carbona', 'serif'],
+				'sans': ['Carbona', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
+				background: '#f5f5f5',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#2CC3D5', // Blip primary cyan
+					DEFAULT: '#1968f0', // Updated to requested blue color
 					foreground: '#FFFFFF',
-					hover: '#00A7BC', // Darker cyan for hover
-					focus: '#00A7BC',
-					light: '#C9DFE4', // Light cyan for subtle elements
+					hover: '#0d5edf', // Darker blue for hover
+					focus: '#0d5edf',
+					light: '#C9DFE4',
 				},
 				secondary: {
-					DEFAULT: '#8E9196', // Blip neutral gray
+					DEFAULT: '#8E9196', 
 					foreground: '#FFFFFF',
-					hover: '#52636C', // Darker gray for hover
-					light: '#F8F9FA', // Light gray for backgrounds
+					hover: '#52636C',
+					light: '#F8F9FA',
 				},
 				blip: {
 					cyan: '#2CC3D5',
 					'dark-cyan': '#00A7BC',
 					'light-cyan': '#C9DFE4',
-					gray: '#8E9196',
+					'gray': '#8E9196',
 					'dark-gray': '#52636C',
 					'light-gray': '#F8F9FA',
 					'soft-gray': '#E8EBEE',
 					'text-gray': '#52636C',
 					'error': '#FF4A1E',
 					'success': '#4DCB7B',
+					'step-green': '#1ba766', // Added for step numbers
 				},
 				destructive: {
-					DEFAULT: '#FF4A1E', // Blip error color
+					DEFAULT: '#FF4A1E',
 					foreground: '#FFFFFF',
 					hover: '#E74A1E',
 				},

@@ -1,11 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CalendarIcon, Building, FileText } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
@@ -23,11 +23,44 @@ import {
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+
+// Mock CNAE data structure
+interface CNAEItem {
+  code: string;
+  description: string;
+}
+
+const mockCNAEData: CNAEItem[] = [
+  { code: "01.11-3", description: "Cultivo de cereais" },
+  { code: "01.12-1", description: "Cultivo de algodão herbáceo e outras fibras" },
+  { code: "01.13-0", description: "Cultivo de cana-de-açúcar" },
+  { code: "01.14-8", description: "Cultivo de fumo" },
+  { code: "01.15-6", description: "Cultivo de soja" },
+  { code: "01.16-4", description: "Cultivo de oleaginosas" },
+  { code: "01.19-9", description: "Cultivo de plantas de lavoura temporária não especificadas" },
+  { code: "01.21-1", description: "Horticultura" },
+  { code: "01.22-9", description: "Cultivo de flores e plantas ornamentais" },
+  { code: "01.31-8", description: "Cultivo de laranja" },
+  { code: "01.32-6", description: "Cultivo de uva" },
+  { code: "01.33-4", description: "Cultivo de frutas de lavoura permanente" },
+  { code: "01.34-2", description: "Cultivo de café" },
+  { code: "01.35-1", description: "Cultivo de cacau" },
+  { code: "01.39-3", description: "Cultivo de plantas de lavoura permanente não especificadas" },
+];
 
 const formSchema = z.object({
   fantasyName: z.string().min(1, { message: "Fantasy name is required" }),
   legalName: z.string().min(1, { message: "Legal name is required" }),
-  documentNumber: z.string().min(1, { message: "CNPJ/CPF is required" }),
+  documentNumber: z.string().length(18, { message: "CNPJ must be in format 00.000.000/0001-00" })
+    .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, { message: "Invalid CNPJ format" }),
   establishmentType: z.string().min(1, { message: "Establishment type is required" }),
   cnae: z.string().min(1, { message: "CNAE/MCC is required" }),
   openingDate: z.date({
@@ -41,6 +74,10 @@ interface CompanyInfoFormProps {
 }
 
 const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) => {
+  const [cnaeOpen, setCnaeOpen] = useState(false);
+  const [cnaeItems, setCnaeItems] = useState<CNAEItem[]>(mockCNAEData);
+  const [cnaeSearchValue, setCnaeSearchValue] = useState("");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,6 +89,46 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
       openingDate: initialData.openingDate || undefined,
     },
   });
+
+  // Format CNPJ as user types
+  const formatCNPJ = (value: string) => {
+    if (!value) return value;
+    
+    const onlyNumbers = value.replace(/\D/g, "").substring(0, 14);
+    
+    if (onlyNumbers.length <= 2) {
+      return onlyNumbers;
+    }
+    if (onlyNumbers.length <= 5) {
+      return `${onlyNumbers.substring(0, 2)}.${onlyNumbers.substring(2)}`;
+    }
+    if (onlyNumbers.length <= 8) {
+      return `${onlyNumbers.substring(0, 2)}.${onlyNumbers.substring(2, 5)}.${onlyNumbers.substring(5)}`;
+    }
+    if (onlyNumbers.length <= 12) {
+      return `${onlyNumbers.substring(0, 2)}.${onlyNumbers.substring(2, 5)}.${onlyNumbers.substring(5, 8)}/${onlyNumbers.substring(8)}`;
+    }
+    return `${onlyNumbers.substring(0, 2)}.${onlyNumbers.substring(2, 5)}.${onlyNumbers.substring(5, 8)}/${onlyNumbers.substring(8, 12)}-${onlyNumbers.substring(12, 14)}`;
+  };
+
+  // Filter CNAE items based on search
+  useEffect(() => {
+    if (cnaeSearchValue) {
+      const filtered = mockCNAEData.filter(
+        item => 
+          item.code.toLowerCase().includes(cnaeSearchValue.toLowerCase()) || 
+          item.description.toLowerCase().includes(cnaeSearchValue.toLowerCase())
+      );
+      setCnaeItems(filtered);
+    } else {
+      setCnaeItems(mockCNAEData);
+    }
+  }, [cnaeSearchValue]);
+
+  const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (...event: any[]) => void) => {
+    const formattedValue = formatCNPJ(e.target.value);
+    onChange(formattedValue);
+  };
 
   return (
     <Form {...form}>
@@ -68,16 +145,11 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
               <FormItem>
                 <FormLabel className="text-blip-text-gray font-medium">Nome Fantasia *</FormLabel>
                 <FormControl>
-                  <div className="flex">
-                    <div className="flex items-center px-3 bg-blip-secondary-light border border-r-0 rounded-l-md border-blip-light-cyan">
-                      <Building className="h-4 w-4 text-blip-gray" />
-                    </div>
-                    <Input
-                      placeholder="Your business name"
-                      {...field}
-                      className="rounded-l-none border-blip-light-cyan focus:border-primary focus:ring-primary"
-                    />
-                  </div>
+                  <Input
+                    placeholder="Your business name"
+                    {...field}
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary bg-white"
+                  />
                 </FormControl>
                 <FormMessage className="text-blip-error" />
               </FormItem>
@@ -94,7 +166,7 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                   <Input 
                     placeholder="Legal name of company" 
                     {...field} 
-                    className="border-blip-light-cyan focus:border-primary focus:ring-primary"
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary bg-white"
                   />
                 </FormControl>
                 <FormMessage className="text-blip-error" />
@@ -107,12 +179,13 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             name="documentNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-blip-text-gray font-medium">CNPJ/CPF *</FormLabel>
+                <FormLabel className="text-blip-text-gray font-medium">CNPJ *</FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="00.000.000/0001-00" 
                     {...field} 
-                    className="border-blip-light-cyan focus:border-primary focus:ring-primary"
+                    onChange={(e) => handleCNPJChange(e, field.onChange)}
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary bg-white"
                   />
                 </FormControl>
                 <FormMessage className="text-blip-error" />
@@ -130,7 +203,7 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                   <Input 
                     placeholder="e.g. Retail, Service" 
                     {...field} 
-                    className="border-blip-light-cyan focus:border-primary focus:ring-primary"
+                    className="border-blip-light-cyan focus:border-primary focus:ring-primary bg-white"
                   />
                 </FormControl>
                 <FormMessage className="text-blip-error" />
@@ -142,20 +215,52 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
             control={form.control}
             name="cnae"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
                 <FormLabel className="text-blip-text-gray font-medium">CNAE / MCC *</FormLabel>
-                <FormControl>
-                  <div className="flex">
-                    <div className="flex items-center px-3 bg-blip-secondary-light border border-r-0 rounded-l-md border-blip-light-cyan">
-                      <FileText className="h-4 w-4 text-blip-gray" />
-                    </div>
-                    <Input
-                      placeholder="Activity code"
-                      {...field}
-                      className="rounded-l-none border-blip-light-cyan focus:border-primary focus:ring-primary"
-                    />
-                  </div>
-                </FormControl>
+                <Popover open={cnaeOpen} onOpenChange={setCnaeOpen}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={cnaeOpen}
+                        className="w-full justify-between border-blip-light-cyan bg-white"
+                      >
+                        {field.value
+                          ? cnaeItems.find((item) => `${item.code} - ${item.description}` === field.value)?.description || field.value
+                          : "Select CNAE"}
+                        <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0" align="start">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Search CNAE..." 
+                        value={cnaeSearchValue}
+                        onValueChange={setCnaeSearchValue}
+                      />
+                      <CommandList>
+                        <CommandEmpty>No CNAE found.</CommandEmpty>
+                        <CommandGroup>
+                          {cnaeItems.map((item) => (
+                            <CommandItem
+                              key={item.code}
+                              value={`${item.code} - ${item.description}`}
+                              onSelect={(currentValue) => {
+                                form.setValue("cnae", currentValue);
+                                setCnaeOpen(false);
+                              }}
+                            >
+                              <span className="text-sm font-medium">{item.code}</span>
+                              <span className="ml-2 text-sm text-muted-foreground">{item.description}</span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage className="text-blip-error" />
               </FormItem>
             )}
@@ -173,7 +278,7 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "pl-3 text-left font-normal border-blip-light-cyan",
+                          "pl-3 text-left font-normal border-blip-light-cyan bg-white",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -186,7 +291,7 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 bg-white" align="start">
                     <Calendar
                       mode="single"
                       selected={field.value}

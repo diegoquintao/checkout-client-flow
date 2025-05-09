@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Banknote } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Form,
   FormControl,
@@ -20,18 +20,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { brazilianBanks } from "@/utils/bankData";
+import { getBankDisplayOptions } from "@/utils/bankData";
+
+const bankOptions = getBankDisplayOptions();
 
 const formSchema = z.object({
   legalName: z.string().min(1, { message: "Legal name is required" }),
   documentNumber: z.string().min(1, { message: "CNPJ/CPF is required" }),
   accountType: z.string().min(1, { message: "Account type is required" }),
   bank: z.string().min(1, { message: "Bank is required" }),
-  bankCode: z.string().min(1, { message: "Bank code is required" }),
-  agency: z.string().min(1, { message: "Agency is required" }),
-  agencyDigit: z.string().optional(),
-  accountNumber: z.string().min(1, { message: "Account number is required" }),
-  accountDigit: z.string().min(1, { message: "Account digit is required" }),
+  agency: z.string().min(1, { message: "Agency is required" })
+    .regex(/^\d+-\d+$/, { message: "Agency should be in format 0000-0" }),
+  accountNumber: z.string().min(1, { message: "Account number is required" })
+    .regex(/^\d+-\d+$/, { message: "Account should be in format 00000-0" }),
   accountType2: z.string().min(1, { message: "Account type is required" }),
 });
 
@@ -41,9 +42,6 @@ interface BankInfoFormProps {
 }
 
 const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
-  const [selectedBank, setSelectedBank] = useState(initialData.bank || "");
-  const [selectedBankCode, setSelectedBankCode] = useState(initialData.bankCode || "");
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,24 +49,90 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
       documentNumber: initialData.documentNumber || "",
       accountType: initialData.accountType || "",
       bank: initialData.bank || "",
-      bankCode: initialData.bankCode || "",
       agency: initialData.agency || "",
-      agencyDigit: initialData.agencyDigit || "",
       accountNumber: initialData.accountNumber || "",
-      accountDigit: initialData.accountDigit || "",
       accountType2: initialData.accountType2 || "",
     },
   });
 
-  // Update bank code when bank selection changes
-  const handleBankChange = (bankName: string) => {
-    const selectedBank = brazilianBanks.find(bank => bank.name === bankName);
-    if (selectedBank) {
-      setSelectedBank(bankName);
-      setSelectedBankCode(selectedBank.code);
-      form.setValue("bank", bankName);
-      form.setValue("bankCode", selectedBank.code);
+  // Handle agency input formatting
+  const formatAgency = (value: string) => {
+    if (!value) return "";
+    
+    // Remove all non-digits and hyphens
+    let cleanValue = value.replace(/[^\d-]/g, "");
+    
+    // Split by hyphen to get parts
+    const parts = cleanValue.split("-");
+    let agencyNumber = "";
+    let agencyDigit = "";
+    
+    if (parts.length > 1) {
+      agencyNumber = parts[0].replace(/\D/g, "");
+      agencyDigit = parts[1].replace(/\D/g, "").substring(0, 1);
+    } else {
+      // If no hyphen, assume all are agency numbers except last digit
+      if (cleanValue.length > 1) {
+        agencyNumber = cleanValue.slice(0, -1).replace(/\D/g, "");
+        agencyDigit = cleanValue.slice(-1).replace(/\D/g, "");
+      } else {
+        agencyNumber = cleanValue.replace(/\D/g, "");
+      }
     }
+    
+    // Format as agency-digit
+    if (agencyNumber && agencyDigit) {
+      return `${agencyNumber}-${agencyDigit}`;
+    } else if (agencyNumber) {
+      return agencyNumber;
+    }
+    
+    return cleanValue;
+  };
+
+  // Handle account input formatting
+  const formatAccount = (value: string) => {
+    if (!value) return "";
+    
+    // Remove all non-digits and hyphens
+    let cleanValue = value.replace(/[^\d-]/g, "");
+    
+    // Split by hyphen to get parts
+    const parts = cleanValue.split("-");
+    let accountNumber = "";
+    let accountDigit = "";
+    
+    if (parts.length > 1) {
+      accountNumber = parts[0].replace(/\D/g, "");
+      accountDigit = parts[1].replace(/\D/g, "").substring(0, 1);
+    } else {
+      // If no hyphen, assume all are account numbers except last digit
+      if (cleanValue.length > 1) {
+        accountNumber = cleanValue.slice(0, -1).replace(/\D/g, "");
+        accountDigit = cleanValue.slice(-1).replace(/\D/g, "");
+      } else {
+        accountNumber = cleanValue.replace(/\D/g, "");
+      }
+    }
+    
+    // Format as account-digit
+    if (accountNumber && accountDigit) {
+      return `${accountNumber}-${accountDigit}`;
+    } else if (accountNumber) {
+      return accountNumber;
+    }
+    
+    return cleanValue;
+  };
+
+  const handleAgencyChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (...event: any[]) => void) => {
+    const formattedValue = formatAgency(e.target.value);
+    onChange(formattedValue);
+  };
+
+  const handleAccountChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (...event: any[]) => void) => {
+    const formattedValue = formatAccount(e.target.value);
+    onChange(formattedValue);
   };
 
   return (
@@ -86,7 +150,7 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
               <FormItem>
                 <FormLabel>Razão Social *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Legal name" {...field} />
+                  <Input placeholder="Legal name" {...field} className="bg-white" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -100,7 +164,7 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
               <FormItem>
                 <FormLabel>CNPJ/CPF *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Document number" {...field} />
+                  <Input placeholder="Document number" {...field} className="bg-white" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,7 +182,7 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select account type" />
                     </SelectTrigger>
                   </FormControl>
@@ -139,18 +203,18 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
               <FormItem>
                 <FormLabel>Banco *</FormLabel>
                 <Select
-                  onValueChange={handleBankChange}
+                  onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full bg-white">
                       <SelectValue placeholder="Select a bank" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {brazilianBanks.map((bank) => (
-                      <SelectItem key={bank.code} value={bank.name}>
-                        {bank.name}
+                    {bankOptions.map((bank) => (
+                      <SelectItem key={bank.value} value={bank.value}>
+                        {bank.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -162,45 +226,17 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
 
           <FormField
             control={form.control}
-            name="bankCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Código *</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Bank code" 
-                    {...field} 
-                    value={selectedBankCode || field.value}
-                    readOnly
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="agency"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Agência *</FormLabel>
+                <FormLabel>Agência-dígito *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Agency number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="agencyDigit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Dígito da Agência</FormLabel>
-                <FormControl>
-                  <Input placeholder="Agency verification digit" {...field} />
+                  <Input 
+                    placeholder="0935-2" 
+                    {...field} 
+                    onChange={(e) => handleAgencyChange(e, field.onChange)}
+                    className="bg-white"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -212,23 +248,14 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
             name="accountNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Conta *</FormLabel>
+                <FormLabel>Conta-dígito *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Account number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="accountDigit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Dígito da Conta *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Account verification digit" {...field} />
+                  <Input 
+                    placeholder="12345-6" 
+                    {...field}
+                    onChange={(e) => handleAccountChange(e, field.onChange)}
+                    className="bg-white"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -246,7 +273,7 @@ const BankInfoForm = ({ initialData = {}, onSubmit }: BankInfoFormProps) => {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select account type" />
                     </SelectTrigger>
                   </FormControl>

@@ -76,7 +76,7 @@ const ResponsibleInfoForm = ({ initialData = {}, onSubmit }: ResponsibleInfoForm
                     <Input
                       placeholder="Full name"
                       {...field}
-                      className="rounded-l-none"
+                      className="rounded-l-none bg-white"
                     />
                   </div>
                 </FormControl>
@@ -92,7 +92,7 @@ const ResponsibleInfoForm = ({ initialData = {}, onSubmit }: ResponsibleInfoForm
               <FormItem>
                 <FormLabel>CPF *</FormLabel>
                 <FormControl>
-                  <Input placeholder="000.000.000-00" {...field} />
+                  <Input placeholder="000.000.000-00" {...field} className="bg-white" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +111,7 @@ const ResponsibleInfoForm = ({ initialData = {}, onSubmit }: ResponsibleInfoForm
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "pl-3 text-left font-normal",
+                          "pl-3 text-left font-normal bg-white",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -124,7 +124,7 @@ const ResponsibleInfoForm = ({ initialData = {}, onSubmit }: ResponsibleInfoForm
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 bg-white" align="start">
                     <Calendar
                       mode="single"
                       selected={field.value}
@@ -152,14 +152,13 @@ const ResponsibleInfoForm = ({ initialData = {}, onSubmit }: ResponsibleInfoForm
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="male">Male</SelectItem>
                     <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="non-binary">Non-binary</SelectItem>
                     <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
                   </SelectContent>
                 </Select>
