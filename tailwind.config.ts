@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,8 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'carbona': ['Carbona', 'serif'],
-				'sans': ['Carbona', 'sans-serif'],
+				'nunito-sans': ['Nunito Sans', 'sans-serif'],
+				'sans': ['Nunito Sans', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
