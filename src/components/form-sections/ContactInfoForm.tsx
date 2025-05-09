@@ -60,7 +60,7 @@ const ContactInfoForm = ({ initialData = {}, onSubmit }: ContactInfoFormProps) =
       let areaCode = "";
       if (numbers.length > 2) {
         areaCode = " (" + numbers.substring(2, 4);
-        if (numbers.length > 4 || (numbers.length === 4 && value.includes(")")) {
+        if ((numbers.length > 4) || (numbers.length === 4 && value.includes(")"))) {
           areaCode += ")";
         }
       }
