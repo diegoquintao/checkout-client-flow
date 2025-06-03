@@ -32,29 +32,12 @@ import {
   CommandList,
 } from "@/components/ui/command";
 
-// Mock CNAE data structure
-interface CNAEItem {
-  code: string;
-  description: string;
+// CNAE API data structure
+interface CNAESubclasse {
+  id: string;
+  descricao: string;
+  observacoes?: string[];
 }
-
-const mockCNAEData: CNAEItem[] = [
-  { code: "01.11-3", description: "Cultivo de cereais" },
-  { code: "01.12-1", description: "Cultivo de algodão herbáceo e outras fibras" },
-  { code: "01.13-0", description: "Cultivo de cana-de-açúcar" },
-  { code: "01.14-8", description: "Cultivo de fumo" },
-  { code: "01.15-6", description: "Cultivo de soja" },
-  { code: "01.16-4", description: "Cultivo de oleaginosas" },
-  { code: "01.19-9", description: "Cultivo de plantas de lavoura temporária não especificadas" },
-  { code: "01.21-1", description: "Horticultura" },
-  { code: "01.22-9", description: "Cultivo de flores e plantas ornamentais" },
-  { code: "01.31-8", description: "Cultivo de laranja" },
-  { code: "01.32-6", description: "Cultivo de uva" },
-  { code: "01.33-4", description: "Cultivo de frutas de lavoura permanente" },
-  { code: "01.34-2", description: "Cultivo de café" },
-  { code: "01.35-1", description: "Cultivo de cacau" },
-  { code: "01.39-3", description: "Cultivo de plantas de lavoura permanente não especificadas" },
-];
 
 const formSchema = z.object({
   fantasyName: z.string().min(1, { message: "Fantasy name is required" }),
@@ -75,8 +58,9 @@ interface CompanyInfoFormProps {
 
 const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) => {
   const [cnaeOpen, setCnaeOpen] = useState(false);
-  const [cnaeItems, setCnaeItems] = useState<CNAEItem[]>(mockCNAEData);
+  const [cnaeItems, setCnaeItems] = useState<CNAESubclasse[]>([]);
   const [cnaeSearchValue, setCnaeSearchValue] = useState("");
+  const [isLoadingCnae, setIsLoadingCnae] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,6 +73,28 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
       openingDate: initialData.openingDate || undefined,
     },
   });
+
+  // Fetch CNAE data from IBGE API
+  const fetchCnaeData = async () => {
+    setIsLoadingCnae(true);
+    try {
+      const response = await fetch('https://servicodados.ibge.gov.br/api/v2/cnae/subclasses');
+      const data = await response.json();
+      setCnaeItems(data);
+      console.log('CNAE data loaded:', data.length, 'items');
+    } catch (error) {
+      console.error('Error fetching CNAE data:', error);
+      // Fallback to empty array if API fails
+      setCnaeItems([]);
+    } finally {
+      setIsLoadingCnae(false);
+    }
+  };
+
+  // Load CNAE data on component mount
+  useEffect(() => {
+    fetchCnaeData();
+  }, []);
 
   // Format CNPJ as user types
   const formatCNPJ = (value: string) => {
@@ -112,18 +118,11 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
   };
 
   // Filter CNAE items based on search
-  useEffect(() => {
-    if (cnaeSearchValue) {
-      const filtered = mockCNAEData.filter(
-        item => 
-          item.code.toLowerCase().includes(cnaeSearchValue.toLowerCase()) || 
-          item.description.toLowerCase().includes(cnaeSearchValue.toLowerCase())
-      );
-      setCnaeItems(filtered);
-    } else {
-      setCnaeItems(mockCNAEData);
-    }
-  }, [cnaeSearchValue]);
+  const filteredCnaeItems = cnaeItems.filter(
+    item => 
+      item.id.toLowerCase().includes(cnaeSearchValue.toLowerCase()) || 
+      item.descricao.toLowerCase().includes(cnaeSearchValue.toLowerCase())
+  );
 
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (...event: any[]) => void) => {
     const formattedValue = formatCNPJ(e.target.value);
@@ -227,8 +226,8 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                         className="w-full justify-between border-blip-light-cyan bg-white"
                       >
                         {field.value
-                          ? cnaeItems.find((item) => `${item.code} - ${item.description}` === field.value)?.description || field.value
-                          : "Select CNAE"}
+                          ? filteredCnaeItems.find((item) => `${item.id} - ${item.descricao}` === field.value)?.descricao || field.value
+                          : isLoadingCnae ? "Loading CNAE..." : "Select CNAE"}
                         <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -241,19 +240,21 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                         onValueChange={setCnaeSearchValue}
                       />
                       <CommandList>
-                        <CommandEmpty>No CNAE found.</CommandEmpty>
+                        <CommandEmpty>
+                          {isLoadingCnae ? "Loading..." : "No CNAE found."}
+                        </CommandEmpty>
                         <CommandGroup>
-                          {cnaeItems.map((item) => (
+                          {filteredCnaeItems.map((item) => (
                             <CommandItem
-                              key={item.code}
-                              value={`${item.code} - ${item.description}`}
+                              key={item.id}
+                              value={`${item.id} - ${item.descricao}`}
                               onSelect={(currentValue) => {
                                 form.setValue("cnae", currentValue);
                                 setCnaeOpen(false);
                               }}
                             >
-                              <span className="text-sm font-medium">{item.code}</span>
-                              <span className="ml-2 text-sm text-muted-foreground">{item.description}</span>
+                              <span className="text-sm font-medium">{item.id}</span>
+                              <span className="ml-2 text-sm text-muted-foreground">{item.descricao}</span>
                             </CommandItem>
                           ))}
                         </CommandGroup>
