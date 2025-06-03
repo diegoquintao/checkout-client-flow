@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -74,17 +73,26 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
     },
   });
 
-  // Fetch CNAE data from IBGE API
+  // Fetch CNAE data from IBGE API and remove duplicates
   const fetchCnaeData = async () => {
     setIsLoadingCnae(true);
     try {
       const response = await fetch('https://servicodados.ibge.gov.br/api/v2/cnae/subclasses');
       const data = await response.json();
-      setCnaeItems(data);
-      console.log('CNAE data loaded:', data.length, 'items');
+      
+      // Remove duplicates based on ID and keep unique subclasses
+      const uniqueSubclasses = data.reduce((acc: CNAESubclasse[], current: CNAESubclasse) => {
+        const existingItem = acc.find(item => item.id === current.id);
+        if (!existingItem) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      setCnaeItems(uniqueSubclasses);
+      console.log('CNAE data loaded:', uniqueSubclasses.length, 'unique items');
     } catch (error) {
       console.error('Error fetching CNAE data:', error);
-      // Fallback to empty array if API fails
       setCnaeItems([]);
     } finally {
       setIsLoadingCnae(false);
@@ -127,6 +135,12 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>, onChange: (...event: any[]) => void) => {
     const formattedValue = formatCNPJ(e.target.value);
     onChange(formattedValue);
+  };
+
+  // Get display text for selected CNAE
+  const getSelectedCnaeDisplay = (value: string) => {
+    const selectedItem = cnaeItems.find(item => item.id === value);
+    return selectedItem ? `${selectedItem.id} - ${selectedItem.descricao}` : value;
   };
 
   return (
@@ -223,16 +237,18 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                         variant="outline"
                         role="combobox"
                         aria-expanded={cnaeOpen}
-                        className="w-full justify-between border-blip-light-cyan bg-white"
+                        className="w-full justify-between border-blip-light-cyan bg-white text-left font-normal"
                       >
-                        {field.value
-                          ? filteredCnaeItems.find((item) => `${item.id} - ${item.descricao}` === field.value)?.descricao || field.value
-                          : isLoadingCnae ? "Loading CNAE..." : "Select CNAE"}
+                        <span className="truncate">
+                          {field.value
+                            ? getSelectedCnaeDisplay(field.value)
+                            : isLoadingCnae ? "Loading CNAE..." : "Select CNAE"}
+                        </span>
                         <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0" align="start">
+                  <PopoverContent className="w-full p-0 bg-white" align="start">
                     <Command>
                       <CommandInput 
                         placeholder="Search CNAE..." 
@@ -247,14 +263,17 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                           {filteredCnaeItems.map((item) => (
                             <CommandItem
                               key={item.id}
-                              value={`${item.id} - ${item.descricao}`}
-                              onSelect={(currentValue) => {
-                                form.setValue("cnae", currentValue);
+                              value={`${item.id} ${item.descricao}`}
+                              onSelect={() => {
+                                form.setValue("cnae", item.id);
                                 setCnaeOpen(false);
                               }}
+                              className="flex flex-col items-start p-3"
                             >
-                              <span className="text-sm font-medium">{item.id}</span>
-                              <span className="ml-2 text-sm text-muted-foreground">{item.descricao}</span>
+                              <div className="flex items-center w-full">
+                                <span className="text-sm font-bold text-blue-600 mr-2">{item.id}</span>
+                                <span className="text-sm text-gray-700 flex-1">{item.descricao}</span>
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
