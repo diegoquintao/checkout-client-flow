@@ -244,7 +244,6 @@ const CompanyInfoForm = ({ initialData = {}, onSubmit }: CompanyInfoFormProps) =
                             ? getSelectedCnaeDisplay(field.value)
                             : isLoadingCnae ? "Loading CNAE..." : "Select CNAE"}
                         </span>
-                        <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
